@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Todos Goals - Redux</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"></script>
 </head>
 <body>
     <div>
@@ -15,45 +16,13 @@
     <div>
         <h1>Goal List</h1>
         <input id="goal" type="text" placeholder="Add Goal"/>
-        <button id="goalBtn">Add Todo</button>
+        <button id="goalBtn">Add Goal</button>
         <ul id="goals"></ul>
     </div>
 
     <script type="text/javascript">
         function generateID(){
             return Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
-        }
-
-        // Library Code
-        function createStore (reducer) {
-            // The store should have four parts
-            // 1. The state
-            // 2. Get the state.
-            // 3. Listen to changes on the state.
-            // 4. Update the state
-
-            let state
-            let listeners = []
-
-            const getState = () => state
-
-            const subscribe = (listener) => {
-                listeners.push(listener)
-                return () => {
-                listeners = listeners.filter((l) => l !== listener)
-                }
-            }
-
-            const dispatch = (action) => {
-                state = reducer(state, action)
-                listeners.forEach((listener) => listener())
-            }
-
-            return {
-                getState,
-                subscribe,
-                dispatch,
-            }
         }
 
         // App Code
@@ -64,31 +33,31 @@
         const REMOVE_GOAL = 'REMOVE_GOAL'
 
         function addTodoAction (todo) {
-        return {
-            type: ADD_TODO,
-            todo,
-        }
+            return {
+                type: ADD_TODO,
+                todo,
+            }
         }
 
         function removeTodoAction (id) {
-        return {
-            type: REMOVE_TODO,
-            id,
-        }
+            return {
+                type: REMOVE_TODO,
+                id,
+            }
         }
 
         function toggleTodoAction (id) {
-        return {
-            type: TOGGLE_TODO,
-            id,
-        }
+            return {
+                type: TOGGLE_TODO,
+                id,
+            }
         }
 
         function addGoalAction (goal) {
-        return {
-            type: ADD_GOAL,
-            goal,
-        }
+            return {
+                type: ADD_GOAL,
+                goal,
+            }
         }
 
         function removeGoalAction (id) {
@@ -99,38 +68,34 @@
         }
 
         function todos (state = [], action) {
-        switch(action.type) {
-            case ADD_TODO :
-            return state.concat([action.todo])
-            case REMOVE_TODO :
-            return state.filter((todo) => todo.id !== action.id)
-            case TOGGLE_TODO :
-            return state.map((todo) => todo.id !== action.id ? todo :
-                Object.assign({}, todo, { complete: !todo.complete }))
-            default :
-            return state
-        }
+            switch(action.type) {
+                case ADD_TODO :
+                return state.concat([action.todo])
+                case REMOVE_TODO :
+                return state.filter((todo) => todo.id !== action.id)
+                case TOGGLE_TODO :
+                return state.map((todo) => todo.id !== action.id ? todo :
+                    Object.assign({}, todo, { complete: !todo.complete }))
+                default :
+                return state
+            }
         }
 
         function goals (state = [], action) {
-        switch(action.type) {
-            case ADD_GOAL :
-            return state.concat([action.goal])
-            case REMOVE_GOAL :
-            return state.filter((goal) => goal.id !== action.id)
-            default :
-            return state
-        }
-        }
-
-        function app (state = {}, action) {
-        return {
-            todos: todos(state.todos, action),
-            goals: goals(state.goals, action),
-        }
+            switch(action.type) {
+                case ADD_GOAL :
+                return state.concat([action.goal])
+                case REMOVE_GOAL :
+                return state.filter((goal) => goal.id !== action.id)
+                default :
+                return state
+            }
         }
 
-        const store = createStore(app)
+        const store = Redux.createStore(Redux.combineReducers({
+            todos,
+            goals,
+        }))
 
         store.subscribe(() => {
             const { goals, todos } = store.getState();
