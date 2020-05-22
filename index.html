@@ -8,6 +8,7 @@
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
     <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
+    <script src="https://unpkg.com/redux-thunk@2.2.0/dist/redux-thunk.min.js"></script>
 </head>
 <body>
     <div id="app"></div>
@@ -65,6 +66,17 @@
                 type: RECEIVE_DATA,
                 todos,
                 goals,
+            }
+        }
+
+        function handleDeleteTodo(todo){
+            return (dispatch) => {
+               dispatch(removeTodoAction(todo.id))
+                return API.deleteTodo(todo.id)
+                    .catch(() => {
+                        dispatch(addTodoAction(todo.id))
+                        alert('An error occured. Try Again!')
+                    })
             }
         }
 
@@ -156,7 +168,7 @@
             todos,
             goals,
             loading,
-        }), Redux.applyMiddleware(checker, logger))
+        }), Redux.applyMiddleware(ReduxThunk.default, checker, logger))
 
     </script>
 
@@ -196,12 +208,7 @@
             }
 
             removeItem = (todo) => {
-                this.props.store.dispatch(removeTodoAction(todo.id))
-                return API.deleteTodo(todo.id)
-                    .catch(() => {
-                        this.props.store.dispatch(addTodoAction(todo.id))
-                        alert('An error occured. Try Again!')
-                    })
+                this.props.store.dispatch(handleDeleteTodo(todo))
             }
 
             toggleItem = (id) => {
