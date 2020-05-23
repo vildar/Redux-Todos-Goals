@@ -105,6 +105,31 @@
             }
         }
 
+        function handleAddTodo(name, cb){
+            return (dispatch) => {
+                return API.saveTodo(name)
+                    .then((todo) => {
+                        dispatch(addTodoAction(todo))
+                        cb()
+                    })
+                    .catch(() => {
+                        alert('Erroc has occurred. Try again.')
+                    })
+            }
+        }
+
+        function handleToggleTodo(id){
+            return (dispatch) => {
+                dispatch(toggleTodoAction(id))
+
+                return API.saveTodoToggle(id)
+                    .catch(() => {
+                        dispatch(toggleTodoAction(id))
+                        alert('An error occured. Try Again!')
+                    })
+            }
+        }
+
         function todos (state = [], action) {
             switch(action.type) {
                 case ADD_TODO :
@@ -221,15 +246,10 @@
             addItem = (e) => {
                 e.preventDefault()
 
-                return API.saveTodo(this.input.value)
-                    .then((todo) => {
-                        this.props.store.dispatch(addTodoAction(todo))
-                        this.input.value = ''
-                    })
-                    .catch(() => {
-                        alert('Erroc has occurred. Try again.')
-                        this.input.value = ''
-                    })
+                this.props.store.dispatch(handleAddTodo(
+                    this.input.value,
+                    () => this.input.value = ''
+                ))
             }
 
             removeItem = (todo) => {
@@ -237,13 +257,7 @@
             }
 
             toggleItem = (id) => {
-                this.props.store.dispatch(toggleTodoAction(id))
-
-                return API.saveTodoToggle(id)
-                    .catch(() => {
-                        this.props.store.dispatch(toggleTodoAction(id))
-                        alert('An error occured. Try Again!')
-                    })
+                this.props.store.dispatch(handleToggleTodo(id))
             }
 
             render(){
